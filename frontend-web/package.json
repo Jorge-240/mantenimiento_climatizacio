@@ -10,15 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.1",
-    "axios": "^1.7.7",
-    "chart.js": "^4.4.4",
-    "react-chartjs-2": "^5.2.0",
     "@headlessui/react": "^2.1.4",
     "@heroicons/react": "^2.1.5",
-    "lucide-react": "^0.441.0"
+    "axios": "^1.7.7",
+    "chart.js": "^4.4.4",
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^0.441.0",
+    "react": "^18.3.1",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.11",
@@ -34,4 +35,3 @@
     "vite": "^5.4.8"
   }
 }
-

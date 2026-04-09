@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { api } from '../services/api'
+import { motion, AnimatePresence } from 'framer-motion'
+import { CheckCircleIcon, ClipboardDocumentListIcon, PlusCircleIcon, WrenchScrewdriverIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
 const TecnicoPanel = () => {
   const [ordenes, setOrdenes] = useState([])
@@ -20,10 +22,8 @@ const TecnicoPanel = () => {
   const fetchOrdenes = async () => {
     try {
       setLoading(true)
-      const res = await api.get(`/tecnico/ordenes`, {
-        params: { estado: filter }
-      })
-      setOrdenes(res.data.data || [])
+      const res = await api.get(`/tecnico/ordenes`, { params: { estado: filter } })
+      setOrdenes(res.data?.data || [])
     } catch (error) {
       console.error('Error:', error)
     } finally {
@@ -43,181 +43,198 @@ const TecnicoPanel = () => {
         horasTrabajadas: parseFloat(mantenimiento.horasTrabajadas),
         evidenciaUrl: 'https://via.placeholder.com/400'
       })
-      alert('✅ Mantenimiento registrado')
       setMantenimiento({ tipo: 'PREVENTIVO', descripcion: '', horasTrabajadas: '' })
       setSelectedOrden(null)
       setShowForm(false)
       fetchOrdenes()
     } catch (error) {
-      alert('❌ Error: ' + error.response?.data?.error)
+      alert('❌ Error: ' + (error.response?.data?.error || 'Error desconocido'))
     }
   }
 
   const handleCompletarOrden = async (ordenId) => {
     try {
       await api.put(`/tecnico/ordenes/${ordenId}/completar`, {})
-      alert('✅ Orden completada')
       fetchOrdenes()
     } catch (error) {
       alert('❌ Error: ' + error.response?.data?.error)
     }
   }
 
-  if (loading) return <div className="p-8 text-center">Cargando órdenes...</div>
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  }
+
+  if (loading) return (
+    <div className="flex justify-center items-center h-screen">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-500"></div>
+    </div>
+  )
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Panel Técnico</h1>
-          <p className="text-gray-600">Gestiona tus órdenes de mantenimiento y registra actividades</p>
+    <motion.div initial="hidden" animate="visible" variants={containerVariants} className="p-4 md:p-8 space-y-8">
+      
+      <div className="flex flex-col md:flex-row justify-between items-center bg-surface/40 backdrop-blur-md p-6 rounded-3xl border border-white/5 shadow-glass gap-4">
+        <div className="w-full">
+          <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+            <WrenchScrewdriverIcon className="h-8 w-8 text-accent-500" />
+            Panel Técnico
+          </h1>
+          <p className="text-slate-400 mt-1">Central de operaciones y registro de mantenimientos</p>
         </div>
+      </div>
 
-        {/* Filtros */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="flex gap-4 flex-wrap">
-            {['EN_PROGRESO', 'PENDIENTE', 'COMPLETADA'].map(status => (
-              <button
-                key={status}
-                onClick={() => setFilter(status)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                  filter === status
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                {status === 'EN_PROGRESO' && '🔄 En Progreso'}
-                {status === 'PENDIENTE' && '⏳ Pendientes'}
-                {status === 'COMPLETADA' && '✅ Completadas'}
-              </button>
-            ))}
-          </div>
-        </div>
+      <div className="bg-surface/30 backdrop-blur-md rounded-2xl border border-white/5 p-4 flex gap-3 overflow-x-auto">
+        {['EN_PROGRESO', 'PENDIENTE', 'COMPLETADA'].map(status => (
+          <button
+            key={status}
+            onClick={() => setFilter(status)}
+            className={`px-5 py-2.5 rounded-xl font-bold transition-all whitespace-nowrap ${
+              filter === status
+                ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-glow border border-primary-400/50'
+                : 'bg-background text-slate-400 border border-white/5 hover:border-white/20 hover:text-white'
+            }`}
+          >
+            {status === 'EN_PROGRESO' && '🔄 En Progreso'}
+            {status === 'PENDIENTE' && '⏳ Pendientes'}
+            {status === 'COMPLETADA' && '✅ Completadas'}
+          </button>
+        ))}
+      </div>
 
-        {/* Órdenes Grid */}
-        {ordenes.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <p className="text-gray-500 text-lg">No hay órdenes en este estado</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {ordenes.map(orden => (
-              <div key={orden.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900">Orden #{orden.id}</h3>
-                    <p className="text-sm text-gray-500">{orden.cliente.usuario.nombre}</p>
-                  </div>
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    orden.estado === 'EN_PROGRESO' ? 'bg-blue-100 text-blue-800' :
-                    orden.estado === 'COMPLETADA' ? 'bg-green-100 text-green-800' :
-                    'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {orden.estado}
-                  </span>
+      {ordenes.length === 0 ? (
+        <motion.div variants={itemVariants} className="bg-surface/30 border border-white/5 backdrop-blur-xl rounded-3xl p-16 text-center">
+          <ClipboardDocumentListIcon className="h-16 w-16 text-slate-600 mx-auto mb-4" />
+          <p className="text-slate-300 text-xl font-medium mb-2">No hay órdenes en este estado</p>
+        </motion.div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {ordenes.map(orden => (
+            <motion.div key={orden.id} variants={itemVariants} className="bg-surface/50 border border-white/10 rounded-3xl p-6 shadow-glass hover:border-primary-500/30 transition-all flex flex-col relative overflow-hidden group">
+              <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-primary-500 to-accent-500"></div>
+              
+              <div className="flex justify-between items-start mb-6 pl-4">
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-1"><span className="text-primary-500">#</span>{orden.id}</h3>
+                  <p className="text-sm font-medium text-slate-300 bg-background/50 px-3 py-1 rounded-full border border-white/5 inline-block">
+                    {orden.cliente?.usuario?.nombre || 'Cliente Anónimo'}
+                  </p>
                 </div>
+                <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${
+                  orden.estado === 'EN_PROGRESO' ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30' :
+                  orden.estado === 'COMPLETADA' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                  'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                }`}>
+                  {orden.estado}
+                </span>
+              </div>
 
-                <div className="bg-gray-50 rounded p-3 mb-4">
-                  <p className="text-sm text-gray-700"><strong>Equipo:</strong> {orden.equipo.modelo}</p>
-                  <p className="text-sm text-gray-700"><strong>Serial:</strong> {orden.equipo.serial}</p>
-                  <p className="text-sm text-gray-700"><strong>Ubicación:</strong> {orden.equipo.ubicacion}</p>
-                  <p className="text-sm text-gray-700 line-clamp-2 mt-2"><strong>Descripción:</strong> {orden.descripcion}</p>
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      setSelectedOrden(orden)
-                      setShowForm(true)
-                    }}
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                  >
-                    📝 Registrar Mant.
-                  </button>
-                  {orden.mantenimientos && orden.mantenimientos.length > 0 && (
-                    <button
-                      onClick={() => handleCompletarOrden(orden.id)}
-                      className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-                    >
-                      ✅ Completar
-                    </button>
-                  )}
+              <div className="bg-background/40 p-4 rounded-2xl border border-white/5 mb-6 pl-6 space-y-2">
+                <p className="text-sm text-slate-300"><strong className="text-white font-medium">Equipo:</strong> {orden.equipo?.modelo} <span className="text-slate-500">({orden.equipo?.serial})</span></p>
+                <p className="text-sm text-slate-300"><strong className="text-white font-medium">Ubicación:</strong> {orden.equipo?.ubicacion}</p>
+                <div className="pt-2 mt-2 border-t border-white/5">
+                  <p className="text-sm text-slate-400 font-medium mb-1">Descripción del problema:</p>
+                  <p className="text-slate-200">{orden.descripcion}</p>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
 
-        {/* Modal Mantenimiento */}
+              <div className="flex gap-3 pl-4 mt-auto">
+                <button
+                  onClick={() => { setSelectedOrden(orden); setShowForm(true); }}
+                  className="flex-1 flex justify-center items-center gap-2 px-4 py-3 bg-surface border border-primary-500/30 hover:border-primary-500 hover:bg-primary-500/10 text-primary-400 rounded-xl font-bold transition-all"
+                >
+                  <PlusCircleIcon className="h-5 w-5" /> Registrar Mant.
+                </button>
+                {(orden.mantenimientos?.length > 0 && orden.estado !== 'COMPLETADA') && (
+                  <button
+                    onClick={() => handleCompletarOrden(orden.id)}
+                    className="flex-1 flex justify-center items-center gap-2 px-4 py-3 bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 text-emerald-400 rounded-xl font-bold transition-all"
+                  >
+                    <CheckCircleIcon className="h-5 w-5" /> Completar
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      <AnimatePresence>
         {showForm && selectedOrden && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-              <h2 className="text-2xl font-bold mb-4">Registrar Mantenimiento</h2>
-              <p className="text-gray-600 mb-6">Orden #{selectedOrden.id} - {selectedOrden.equipo.modelo}</p>
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          >
+            <motion.div 
+              initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}
+              className="bg-surface border border-white/10 rounded-3xl shadow-glow max-w-md w-full p-8"
+            >
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                    <WrenchScrewdriverIcon className="h-6 w-6 text-primary-400" />
+                    Nuevo Reporte
+                  </h2>
+                  <p className="text-sm text-slate-400 mt-1">Orden #{selectedOrden.id} - {selectedOrden.equipo?.modelo}</p>
+                </div>
+                <button onClick={() => setShowForm(false)} className="text-slate-400 hover:text-white transition-colors">
+                  <XMarkIcon className="h-6 w-6" />
+                </button>
+              </div>
 
-              <form onSubmit={handleCrearMantenimiento}>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+              <form onSubmit={handleCrearMantenimiento} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">Clasificación</label>
                   <select
                     value={mantenimiento.tipo}
                     onChange={(e) => setMantenimiento({...mantenimiento, tipo: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-white/10 rounded-xl bg-background text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 appearance-none"
                   >
-                    <option value="PREVENTIVO">Preventivo</option>
-                    <option value="CORRECTIVO">Correctivo</option>
+                    <option value="PREVENTIVO">Mantenimiento Preventivo</option>
+                    <option value="CORRECTIVO">Mantenimiento Correctivo</option>
                   </select>
                 </div>
 
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">Resumen de labores</label>
                   <textarea
                     value={mantenimiento.descripcion}
                     onChange={(e) => setMantenimiento({...mantenimiento, descripcion: e.target.value})}
-                    placeholder="Describe el trabajo realizado..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows="4"
-                    required
+                    placeholder="Detalla los repuestos usados y el trabajo final..."
+                    className="w-full px-4 py-3 border border-white/10 rounded-xl bg-background text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                    rows="4" required
                   />
                 </div>
 
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Horas Trabajadas</label>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">Horas Invertidas</label>
                   <input
-                    type="number"
-                    step="0.5"
+                    type="number" step="0.5" min="0"
                     value={mantenimiento.horasTrabajadas}
                     onChange={(e) => setMantenimiento({...mantenimiento, horasTrabajadas: e.target.value})}
-                    placeholder="2.5"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Ej. 1.5"
+                    className="w-full px-4 py-3 border border-white/10 rounded-xl bg-background text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
                     required
                   />
                 </div>
 
-                <div className="flex gap-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowForm(false)
-                      setMantenimiento({ tipo: 'PREVENTIVO', descripcion: '', horasTrabajadas: '' })
-                    }}
-                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
-                  >
-                    Guardar
+                <div className="flex gap-4 pt-4">
+                  <button type="submit" className="w-full py-4 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-400 hover:to-primary-500 text-white rounded-xl font-bold shadow-glow transition-all">
+                    Registrar Actividad
                   </button>
                 </div>
               </form>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
-      </div>
-    </div>
+      </AnimatePresence>
+    </motion.div>
   )
 }
 

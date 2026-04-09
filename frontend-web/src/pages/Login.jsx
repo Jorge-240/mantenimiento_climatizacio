@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { UserIcon, EnvelopeIcon, KeyIcon } from '@heroicons/react/24/outline'
+import { motion } from 'framer-motion'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -25,78 +26,125 @@ const Login = () => {
     setLoading(false)
   }
 
+  // Animaciones Framer Motion
+  const containerVariants = {
+    hidden: { opacity: 0, scale: 0.95, y: 20 },
+    visible: { 
+      opacity: 1, 
+      scale: 1, 
+      y: 0,
+      transition: { duration: 0.5, ease: "easeOut", staggerChildren: 0.1 }
+    }
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 15 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <div className="mx-auto h-20 w-20 bg-primary-500 rounded-2xl flex items-center justify-center">
-            <UserIcon className="h-10 w-10 text-white" />
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 relative overflow-hidden">
+      
+      {/* Elementos decorativos Cyber-tech */}
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary-600 rounded-full mix-blend-screen filter blur-[100px] opacity-20 animate-pulse"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-accent-500 rounded-full mix-blend-screen filter blur-[100px] opacity-20 animate-pulse" style={{ animationDelay: '2s' }}></div>
+
+      <motion.div 
+        className="max-w-user w-full max-w-md space-y-8 z-10"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div className="text-center" variants={itemVariants}>
+          <div className="mx-auto h-24 w-24 bg-surface/50 border border-primary-500/30 rounded-2xl flex items-center justify-center shadow-glow backdrop-blur-md mb-6">
+            <UserIcon className="h-12 w-12 text-primary-400" />
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-white">Iniciar Sesión</h2>
-          <p className="mt-2 text-primary-100">Sistema Mantenimiento Climatización SENA</p>
-        </div>
-        <form className="mt-8 space-y-6 bg-white/20 backdrop-blur-xl rounded-2xl p-8" onSubmit={handleSubmit}>
-          {error && <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg">{error}</div>}
+          <h2 className="mt-2 text-4xl font-bold text-white tracking-tight">Iniciar Sesión</h2>
+          <p className="mt-3 text-primary-400/80 font-medium tracking-wide uppercase text-sm">Climatización Inteligente ADSO</p>
+        </motion.div>
+
+        <motion.form 
+          className="mt-8 space-y-6 bg-surface/40 backdrop-blur-xl border border-white/5 rounded-3xl p-8 shadow-glass relative overflow-hidden" 
+          onSubmit={handleSubmit}
+          variants={itemVariants}
+        >
+          {/* Brillo interno superior */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary-500/50 to-transparent"></div>
+
+          {error && (
+            <motion.div 
+              initial={{ opacity: 0, x: -10 }} 
+              animate={{ opacity: 1, x: 0 }} 
+              className="bg-red-500/10 border-l-4 border-red-500 text-red-400 px-4 py-3 rounded-r-lg font-medium text-sm"
+            >
+              {error}
+            </motion.div>
+          )}
           
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-200 mb-2">
-              Email
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <EnvelopeIcon className="h-5 w-5 text-gray-400" />
+          <div className="space-y-5">
+            <motion.div variants={itemVariants}>
+              <label htmlFor="email" className="block text-sm font-semibold text-slate-300 mb-2">
+                Correo Electrónico
+              </label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <EnvelopeIcon className="h-5 w-5 text-primary-500/70 group-focus-within:text-primary-400 transition-colors" />
+                </div>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  className="pl-12 pr-4 py-3.5 w-full border border-white/10 rounded-xl bg-background/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400 transition-all shadow-inner"
+                  placeholder="admin@sena.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="pl-10 pr-3 py-3 w-full border border-gray-600 rounded-xl bg-white/10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                placeholder="admin@sena.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <label htmlFor="password" className="block text-sm font-semibold text-slate-300 mb-2">
+                Contraseña
+              </label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <KeyIcon className="h-5 w-5 text-primary-500/70 group-focus-within:text-primary-400 transition-colors" />
+                </div>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  className="pl-12 pr-4 py-3.5 w-full border border-white/10 rounded-xl bg-background/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400 transition-all shadow-inner"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+            </motion.div>
           </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-200 mb-2">
-              Password
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <KeyIcon className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="pl-10 pr-3 py-3 w-full border border-gray-600 rounded-xl bg-white/10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                placeholder="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
+          <motion.div variants={itemVariants} className="pt-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className="group relative w-full flex justify-center py-4 px-4 border border-transparent text-sm font-bold rounded-xl text-background bg-gradient-to-r from-primary-400 to-primary-600 hover:from-primary-300 hover:to-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-primary-500 transition-all duration-300 shadow-glow disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+            >
+              {/* Brillo en hover */}
+              <div className="absolute inset-0 w-full h-full bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+              <span className="relative">{loading ? 'Verificando...' : 'Acceder al Sistema'}</span>
+            </button>
+          </motion.div>
+        </motion.form>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 disabled:opacity-50"
-          >
-            {loading ? 'Iniciando...' : 'Ingresar'}
-          </button>
-        </form>
-
-        <div className="text-center text-sm text-gray-300 space-y-2">
-          <p>Demo: admin@sena.com / password</p>
-          <p>Cliente: cliente@test.com | Técnico: tecnico@test.com</p>
-        </div>
-      </div>
+        <motion.div variants={itemVariants} className="text-center text-xs font-medium text-slate-500 space-y-1">
+          <p>Demo Admin: <span className="text-primary-400">admin@sena.com</span></p>
+          <p>Técnico: <span className="text-primary-400">tecnico@test.com</span> | Cliente: <span className="text-accent-500">cliente@test.com</span></p>
+        </motion.div>
+      </motion.div>
     </div>
   )
 }
 
 export default Login
-
