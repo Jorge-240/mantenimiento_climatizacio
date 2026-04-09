@@ -11,10 +11,23 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    if (token) {
-      api.defaults.headers.Authorization = `Bearer ${token}`
-      // Validar token con API si necesario
-      setUser(JSON.parse(localStorage.getItem('user') || '{}'))
+    const storedUser = localStorage.getItem('user')
+    
+    if (token && storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser)
+        if (parsedUser && parsedUser.rol) {
+          api.defaults.headers.Authorization = `Bearer ${token}`
+          setUser(parsedUser)
+        } else {
+          // Si hay token pero el usuario no tiene rol, limpiar para evitar crashes
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+        }
+      } catch (e) {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+      }
     }
     setLoading(false)
   }, [])
