@@ -28,7 +28,11 @@
     "@babel/core": "^7.20.0"
   },
   "overrides": {
-    "react": "18.2.0"
+    "react": "18.2.0",
+    "metro": "0.80.12",
+    "metro-config": "0.80.12",
+    "metro-resolver": "0.80.12",
+    "metro-core": "0.80.12"
   },
   "expo": {
     "plugins": [

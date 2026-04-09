@@ -23,11 +23,11 @@ function App() {
     <Router>
       <Routes>
         {/* Rutas Públicas */}
-        <Route path="/login" element={user ? <Navigate to={`/${user.rol.toLowerCase()}`} replace /> : <Login />} />
+        <Route path="/login" element={user?.rol ? <Navigate to={`/${user.rol.toLowerCase()}`} replace /> : <Login />} />
         
         {/* Rutas Privadas con Layout Cyber-Tech */}
-        <Route path="/" element={user ? <Layout /> : <Navigate to="/login" replace />}>
-          <Route index element={user?.rol ? <Navigate to={`/${user.rol.toLowerCase()}`} replace /> : <div>Cargando ruteo...</div>} />
+        <Route path="/" element={user?.rol ? <Layout /> : <Navigate to="/login" replace />}>
+          <Route index element={user?.rol ? <Navigate to={`/${user.rol.toLowerCase()}`} replace /> : <div>Redirigiendo...</div>} />
           
           {/* Rutas por Rol */}
           <Route path="admin" element={user?.rol === 'ADMIN' ? <AdminDashboard /> : <Navigate to="/login" />} />
@@ -37,11 +37,9 @@ function App() {
           
           <Route path="tecnico" element={user?.rol === 'TECNICO' ? <TecnicoPanel /> : <Navigate to="/login" />} />
           <Route path="cliente" element={user?.rol === 'CLIENTE' ? <ClienteArea /> : <Navigate to="/login" />} />
-          <Route path="tecnico" element={user?.rol === 'TECNICO' ? <TecnicoPanel /> : <Navigate to="/login" />} />
-          <Route path="cliente" element={user?.rol === 'CLIENTE' ? <ClienteArea /> : <Navigate to="/login" />} />
           
           {/* Fallback */}
-          <Route path="dashboard" element={<Navigate to={`/${user.rol?.toLowerCase()}`} replace />} />
+          <Route path="dashboard" element={user?.rol ? <Navigate to={`/${user.rol.toLowerCase()}`} replace /> : <Navigate to="/login" />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/login" replace />} />
