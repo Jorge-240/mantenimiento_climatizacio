@@ -7,7 +7,7 @@ WORKDIR /app
 COPY backend/package*.json ./
 
 # Instalar dependencias (solo producción)
-RUN npm ci --only=production && npm cache clean --force
+RUN npm install --omit=dev && npm cache clean --force
 
 # Copiar Prisma schema generador
 COPY backend/prisma ./prisma/
