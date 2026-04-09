@@ -7,7 +7,8 @@
       "buildContext": ".",
       "port": 3001,
       "volumes": [],
-      "startCommand": "npx prisma db push --accept-data-loss ; npm run seed ; npm start"
+      "volumes": [],
+      "startCommand": "npm start & sleep 5 ; npx prisma db push --accept-data-loss ; npm run seed"
     }
   }
 }

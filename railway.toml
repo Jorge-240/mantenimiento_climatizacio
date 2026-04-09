@@ -3,7 +3,7 @@ builder = "dockerfile"
 dockerfilePath = "./Dockerfile"
 
 [deploy]
-startCommand = "npx prisma db push --accept-data-loss ; npm run seed ; npm start"
+startCommand = "npm start & sleep 5 ; npx prisma db push --accept-data-loss ; npm run seed"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 5
 
