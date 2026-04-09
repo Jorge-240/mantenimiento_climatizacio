@@ -1,0 +1,12 @@
+# Archivos y carpetas a ignorar en Railway
+node_modules/
+frontend-web/
+mobile-app/
+database/
+.git/
+.gitignore
+.env.local
+.env.*.local
+*.log
+.DS_Store
+TODO.md

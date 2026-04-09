@@ -1,0 +1,11 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "./Dockerfile"
+
+[deploy]
+startCommand = "npm start"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 5
+
+[doc]
+help = "Sistema de Gestión de Mantenimiento de Climatización - Backend"

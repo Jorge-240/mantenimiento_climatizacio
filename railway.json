@@ -1,0 +1,13 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "services": {
+    "backend": {
+      "builder": "dockerfile",
+      "dockerfilePath": "./Dockerfile",
+      "buildContext": ".",
+      "port": 3001,
+      "volumes": [],
+      "startCommand": "npm start"
+    }
+  }
+}
