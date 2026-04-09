@@ -96,7 +96,7 @@ model Mantenimiento {
   descripcion     String          @db.Text
   evidenciaUrl    String?         @map("evidencia_url")
   fechaEjecucion  DateTime?       @map("fecha_ejecucion")
-  horasTrabajadas Float?          @map("horas_trabajadas") @db.Decimal(4, 2)
+  horasTrabajadas Decimal?        @map("horas_trabajadas") @db.Decimal(4, 2)
   observaciones   String?         @db.Text
   
   orden           OrdenTrabajo    @relation(fields: [ordenId], references: [id], onDelete: Cascade)
@@ -109,7 +109,7 @@ model Repuesto {
   id          Int              @id @default(autoincrement())
   nombre      String
   codigo      String           @unique
-  precioUnitario Float         @map("precio_unitario") @db.Decimal(10, 2)
+  precioUnitario Decimal       @map("precio_unitario") @db.Decimal(10, 2)
   stock       Int              @default(0)
   createdAt   DateTime         @default(now()) @map("created_at")
   
@@ -123,7 +123,7 @@ model DetalleRepuesto {
   mantenimientoId Int    @map("mantenimiento_id")
   repuestoId     Int
   cantidad       Int
-  costoTotal     Float    @map("costo_total") @db.Decimal(10, 2)
+  costoTotal     Decimal  @map("costo_total") @db.Decimal(10, 2)
   
   mantenimiento  Mantenimiento @relation(fields: [mantenimientoId], references: [id], onDelete: Cascade)
   repuesto       Repuesto      @relation(fields: [repuestoId], references: [id], onDelete: Cascade)
@@ -135,7 +135,7 @@ model DetalleRepuesto {
 model Cotizacion {
   id             Int          @id @default(autoincrement())
   ordenId        Int          @map("orden_id")
-  total          Float        @db.Decimal(10, 2)
+  total          Decimal      @db.Decimal(10, 2)
   descripcion    String?      @db.Text
   fechaGeneracion DateTime    @default(now()) @map("fecha_generacion")
   estado         EstadoCotizacion @default(PENDIENTE)
