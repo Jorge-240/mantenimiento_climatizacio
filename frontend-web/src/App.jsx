@@ -2,6 +2,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useAuth } from './hooks/useAuth'
 import Login from './pages/Login'
 import AdminDashboard from './pages/AdminDashboard'
+import Equipos from './pages/Equipos'
+import Tecnicos from './pages/Tecnicos'
+import Ordenes from './pages/Ordenes'
 import TecnicoPanel from './pages/TecnicoPanel'
 import ClienteArea from './pages/ClienteArea'
 import Layout from './components/Layout'
@@ -10,9 +13,9 @@ function App() {
   const { user, loading } = useAuth()
 
   if (loading) return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background">
-       <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin shadow-glow"></div>
-       <p className="mt-4 text-slate-400 font-bold tracking-widest animate-pulse">CARGANDO SISTEMA...</p>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background text-slate-400">
+       <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+       <p className="mt-4 font-bold tracking-widest animate-pulse">CARGANDO...</p>
     </div>
   )
 
@@ -28,6 +31,12 @@ function App() {
           
           {/* Rutas por Rol */}
           <Route path="admin" element={user?.rol === 'ADMIN' ? <AdminDashboard /> : <Navigate to="/login" />} />
+          <Route path="admin/equipos" element={user?.rol === 'ADMIN' ? <Equipos /> : <Navigate to="/login" />} />
+          <Route path="admin/tecnicos" element={user?.rol === 'ADMIN' ? <Tecnicos /> : <Navigate to="/login" />} />
+          <Route path="admin/ordenes" element={user?.rol === 'ADMIN' ? <Ordenes /> : <Navigate to="/login" />} />
+          
+          <Route path="tecnico" element={user?.rol === 'TECNICO' ? <TecnicoPanel /> : <Navigate to="/login" />} />
+          <Route path="cliente" element={user?.rol === 'CLIENTE' ? <ClienteArea /> : <Navigate to="/login" />} />
           <Route path="tecnico" element={user?.rol === 'TECNICO' ? <TecnicoPanel /> : <Navigate to="/login" />} />
           <Route path="cliente" element={user?.rol === 'CLIENTE' ? <ClienteArea /> : <Navigate to="/login" />} />
           

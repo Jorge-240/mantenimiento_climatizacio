@@ -29,9 +29,9 @@ const Layout = () => {
   const navigation = {
     ADMIN: [
       { name: 'Dashboard', href: '/admin', icon: HomeIcon },
-      { name: 'Equipos', href: '#', icon: ServerIcon },
-      { name: 'Técnicos', href: '#', icon: WrenchIcon },
-      { name: 'Órdenes', href: '#', icon: ClipboardDocumentListIcon },
+      { name: 'Equipos', href: '/admin/equipos', icon: ServerIcon },
+      { name: 'Técnicos', href: '/admin/tecnicos', icon: WrenchIcon },
+      { name: 'Órdenes', href: '/admin/ordenes', icon: ClipboardDocumentListIcon },
     ],
     TECNICO: [
       { name: 'Mis Órdenes', href: '/tecnico', icon: ClipboardDocumentListIcon },

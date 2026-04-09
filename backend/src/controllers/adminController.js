@@ -529,6 +529,27 @@ const getDashboardMetrics = async (req, res) => {
   }
 };
 
+const forceReseed = async (req, res) => {
+  try {
+    const { exec } = require('child_process');
+    const path = require('path');
+    
+    // Ejecutar el script de seed usando node directamente
+    const seedPath = path.join(__dirname, '../../prisma/seed.js');
+    
+    exec(`node ${seedPath}`, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error ejecucion seed: ${error.message}`);
+        return res.status(500).json({ error: 'Fallo al ejecutar el seedeo', details: error.message });
+      }
+      console.log(`Seed Output: ${stdout}`);
+      res.json({ success: true, message: 'Seedeo completado con éxito', output: stdout });
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   // Clientes
   getClientes,
@@ -554,6 +575,7 @@ module.exports = {
   createCotizacion,
   updateCotizacion,
   // Dashboard
-  getDashboardMetrics
+  getDashboardMetrics,
+  forceReseed
 };
 

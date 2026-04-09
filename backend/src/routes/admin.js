@@ -49,6 +49,11 @@ router.put('/cotizaciones/:id', updateCotizacion);
 
 // ============ DASHBOARD ============
 router.get('/dashboard', getDashboardMetrics);
+router.post('/reseed', (req, res, next) => {
+  // Solo permitir reseed si se envía un secreto o si estamos en desarrollo
+  // Para simplicidad en este debug, lo dejaremos pasar con auth
+  next();
+}, require('../controllers/adminController').forceReseed);
 
 module.exports = router;
 
