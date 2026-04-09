@@ -6,13 +6,14 @@ const { generateToken } = require('../utils/jwt');
 const register = async (req, res) => {
   try {
     const { nombre, email, password, rol } = req.body;
+    const normalizedRol = rol?.toUpperCase();
 
     // Validación básica
-    if (!nombre || !email || !password || !rol) {
+    if (!nombre || !email || !password || !normalizedRol) {
       return res.status(400).json({ error: 'Todos los campos requeridos' });
     }
 
-    if (!['admin', 'tecnico', 'cliente'].includes(rol)) {
+    if (!['ADMIN', 'TECNICO', 'CLIENTE'].includes(normalizedRol)) {
       return res.status(400).json({ error: 'Rol inválido' });
     }
 
@@ -25,16 +26,16 @@ const register = async (req, res) => {
         nombre,
         email,
         password: hashedPassword,
-        rol
+        rol: normalizedRol
       }
     });
 
     // Auto-crear perfil según rol
-    if (rol === 'cliente') {
+    if (normalizedRol === 'CLIENTE') {
       await prisma.cliente.create({
         data: { usuarioId: usuario.id }
       });
-    } else if (rol === 'tecnico') {
+    } else if (normalizedRol === 'TECNICO') {
       await prisma.tecnico.create({
         data: { usuarioId: usuario.id }
       });

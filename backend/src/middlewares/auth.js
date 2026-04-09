@@ -33,7 +33,11 @@ const authMiddleware = async (req, res, next) => {
 
 const roleMiddleware = (roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.rol)) {
+    // Convertir todo a mayúsculas para evitar problemas de case-sensitivity
+    const userRole = req.user?.rol?.toUpperCase();
+    const allowedRoles = roles.map(r => r.toUpperCase());
+
+    if (!userRole || !allowedRoles.includes(userRole)) {
       return res.status(403).json({ error: 'Rol no autorizado' });
     }
     next();
