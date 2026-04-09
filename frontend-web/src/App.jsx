@@ -9,30 +9,35 @@ import Layout from './components/Layout'
 function App() {
   const { user, loading } = useAuth()
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen">Cargando...</div>
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background">
+       <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin shadow-glow"></div>
+       <p className="mt-4 text-slate-400 font-bold tracking-widest animate-pulse">CARGANDO SISTEMA...</p>
+    </div>
+  )
 
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={user ? <Navigate to="/dashboard" /> : <Login />} />
-          <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
-          <Route path="/dashboard" element={user ? <DashboardRoutes user={user} /> : <Navigate to="/login" />} />
+        {/* Rutas Públicas */}
+        <Route path="/login" element={user ? <Navigate to={`/${user.rol.toLowerCase()}`} replace /> : <Login />} />
+        
+        {/* Rutas Privadas con Layout Cyber-Tech */}
+        <Route path="/" element={user ? <Layout /> : <Navigate to="/login" replace />}>
+          <Route index element={<Navigate to={`/${user.rol.toLowerCase()}`} replace />} />
+          
+          {/* Rutas por Rol */}
+          <Route path="admin" element={user?.rol === 'ADMIN' ? <AdminDashboard /> : <Navigate to="/login" />} />
+          <Route path="tecnico" element={user?.rol === 'TECNICO' ? <TecnicoPanel /> : <Navigate to="/login" />} />
+          <Route path="cliente" element={user?.rol === 'CLIENTE' ? <ClienteArea /> : <Navigate to="/login" />} />
+          
+          {/* Fallback */}
+          <Route path="dashboard" element={<Navigate to={`/${user.rol?.toLowerCase()}`} replace />} />
         </Route>
+
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
-  )
-}
-
-function DashboardRoutes({ user }) {
-  return (
-    <Routes>
-      <Route path="/dashboard" element={<Navigate to={`/${user.rol.toLowerCase()}`} replace />} />
-      <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/tecnico" element={<TecnicoPanel />} />
-      <Route path="/cliente" element={<ClienteArea />} />
-      <Route path="*" element={<Navigate to="/login" />} />
-    </Routes>
   )
 }
 

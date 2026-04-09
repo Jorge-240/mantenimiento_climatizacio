@@ -4,7 +4,7 @@
 
 @layer base {
   html {
-    font-family: system-ui, sans-serif;
+    font-family: 'Outfit', sans-serif;
   }
 }
 
@@ -15,9 +15,9 @@ body {
   /* Cyber-tech background: subtle grid + radial glow */
   background-image: 
     radial-gradient(circle at 50% 0%, theme('colors.surface') 0%, transparent 50%),
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 100% 100%, 40px 40px, 40px 40px;
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 30px 30px, 30px 30px;
   color: #f8fafc; /* text-slate-50 */
 }
 
