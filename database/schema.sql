@@ -5,8 +5,8 @@
 -- ============================================================
 
 -- Crear base de datos
-CREATE DATABASE IF NOT EXISTS mantenimiento_climatizacion;
-USE mantenimiento_climatizacion;
+CREATE DATABASE IF NOT EXISTS railway;
+USE railway;
 
 -- ============================================================
 -- TABLA: usuarios (Base para todos los roles)
