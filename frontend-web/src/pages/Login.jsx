@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { LoginIcon, KeyIcon } from '@heroicons/react/24/outline'
+import { UserIcon, EnvelopeIcon, KeyIcon } from '@heroicons/react/24/outline'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -30,7 +30,7 @@ const Login = () => {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="mx-auto h-20 w-20 bg-primary-500 rounded-2xl flex items-center justify-center">
-            <LoginIcon className="h-10 w-10 text-white" />
+            <UserIcon className="h-10 w-10 text-white" />
           </div>
           <h2 className="mt-6 text-3xl font-bold text-white">Iniciar Sesión</h2>
           <p className="mt-2 text-primary-100">Sistema Mantenimiento Climatización SENA</p>
@@ -44,7 +44,7 @@ const Login = () => {
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <LoginIcon className="h-5 w-5 text-gray-400" />
+                <EnvelopeIcon className="h-5 w-5 text-gray-400" />
               </div>
               <input
                 id="email"
