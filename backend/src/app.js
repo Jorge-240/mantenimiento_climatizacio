@@ -22,6 +22,19 @@ app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Log de diagnóstico en arranque
+(async () => {
+  try {
+    const userCount = await prisma.usuario.count();
+    console.log(`📊 DIAGNÓSTICO DB: Encontrados ${userCount} usuarios en la base de datos.`);
+    if (userCount === 0) {
+      console.warn('🚨 ALERTA: La tabla de usuarios está VACÍA.');
+    }
+  } catch (error) {
+    console.error('❌ ERROR DIAGNÓSTICO DB:', error.message);
+  }
+})();
+
 // Health check
 app.get('/health', async (req, res) => {
   try {
