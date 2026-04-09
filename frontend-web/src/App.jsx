@@ -24,7 +24,7 @@ function App() {
         
         {/* Rutas Privadas con Layout Cyber-Tech */}
         <Route path="/" element={user ? <Layout /> : <Navigate to="/login" replace />}>
-          <Route index element={<Navigate to={`/${user.rol.toLowerCase()}`} replace />} />
+          <Route index element={user?.rol ? <Navigate to={`/${user.rol.toLowerCase()}`} replace /> : <div>Cargando ruteo...</div>} />
           
           {/* Rutas por Rol */}
           <Route path="admin" element={user?.rol === 'ADMIN' ? <AdminDashboard /> : <Navigate to="/login" />} />

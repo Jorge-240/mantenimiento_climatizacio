@@ -29,7 +29,7 @@ const Layout = () => {
   const navigation = {
     ADMIN: [
       { name: 'Dashboard', href: '/admin', icon: HomeIcon },
-      { name: 'Clientes', href: '#', icon: UsersIcon },
+      { name: 'Equipos', href: '#', icon: ServerIcon },
       { name: 'Técnicos', href: '#', icon: WrenchIcon },
       { name: 'Órdenes', href: '#', icon: ClipboardDocumentListIcon },
     ],
@@ -41,10 +41,10 @@ const Layout = () => {
     ]
   }
 
-  const currentNav = navigation[user.rol] || []
+  const currentNav = user?.rol ? (navigation[user.rol] || []) : []
 
   return (
-    <div className="min-h-screen bg-background text-slate-200 font-outfit overflow-x-hidden">
+    <div className="min-h-screen bg-background text-slate-200 font-sans overflow-x-hidden">
       {/* Navbar Superior */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-surface/40 backdrop-blur-xl border-b border-white/5 h-20">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
