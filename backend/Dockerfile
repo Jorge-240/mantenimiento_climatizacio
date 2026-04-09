@@ -20,5 +20,5 @@ COPY src ./src
 
 EXPOSE 3001
 
-CMD ["npm", "start"]
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && npm run seed && npm start"]
 

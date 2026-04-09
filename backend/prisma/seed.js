@@ -9,7 +9,13 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Iniciando seed de datos...');
 
-  // Limpiar datos existentes
+  const count = await prisma.usuario.count();
+  if (count > 0) {
+    console.log('✅ La base de datos ya tiene usuarios. Saltando el vaciado y seeding para no borrar datos existentes.');
+    return;
+  }
+
+  // Limpiar datos existentes (se ejecutará sólo si count === 0, o sea, nunca si hay errores)
   await prisma.detalleRepuesto.deleteMany({});
   await prisma.repuesto.deleteMany({});
   await prisma.cotizacion.deleteMany({});

@@ -24,4 +24,4 @@ COPY backend/src ./src
 EXPOSE ${PORT:-3001}
 
 # Comando para iniciar
-CMD ["npm", "start"]
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && npm run seed && npm start"]
