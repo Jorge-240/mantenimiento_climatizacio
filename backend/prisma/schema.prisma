@@ -1,0 +1,193 @@
+// Prisma Schema - Mirror de MySQL schema.sql
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id        Int       @id @default(autoincrement())
+  nombre    String
+  email     String    @unique
+  password  String
+  rol       Rol
+  activo    Boolean   @default(true)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  
+  cliente   Cliente?  @relation("ClienteUsuario")
+  tecnico   Tecnico?  @relation("TecnicoUsuario")
+  
+  @@map("usuarios")
+}
+
+model Cliente {
+  id           Int      @id @default(autoincrement())
+  usuarioId    Int      @unique @map("usuario_id")
+  empresa      String?
+  nit          String?  @unique
+  telefono     String?
+  direccion    String?
+  
+  usuario      Usuario  @relation("ClienteUsuario", fields: [usuarioId], references: [id], onDelete: Cascade)
+  equipos      Equipo[]
+  ordenes      OrdenTrabajo[]
+  
+  @@map("clientes")
+}
+
+model Tecnico {
+  id            Int      @id @default(autoincrement())
+  usuarioId     Int      @unique @map("usuario_id")
+  especialidad  String?
+  telefono      String?
+  certificado   String?
+  
+  usuario       Usuario  @relation("TecnicoUsuario", fields: [usuarioId], references: [id], onDelete: Cascade)
+  ordenes       OrdenTrabajo[]
+  
+  @@map("tecnicos")
+}
+
+model Equipo {
+  id               Int              @id @default(autoincrement())
+  clienteId        Int              @map("cliente_id")
+  serial           String           @unique
+  modelo           String
+  tipo             TipoEquipo
+  ubicacion        String?
+  fechaInstalacion DateTime?        @map("fecha_instalacion")
+  estado           EstadoEquipo     @default(OPERATIVO)
+  createdAt        DateTime         @default(now()) @map("created_at")
+  
+  cliente          Cliente          @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  ordenes          OrdenTrabajo[]
+  
+  @@map("equipos")
+}
+
+model OrdenTrabajo {
+  id              Int           @id @default(autoincrement())
+  clienteId       Int           @map("cliente_id")
+  equipoId        Int           @map("equipo_id")
+  tecnicoId       Int?          @map("tecnico_id")
+  descripcion     String        @db.Text
+  fechaSolicitud  DateTime      @default(now()) @map("fecha_solicitud")
+  fechaAsignacion DateTime?     @map("fecha_asignacion")
+  estado          EstadoOrden   @default(PENDIENTE)
+  prioridad       Prioridad     @default(MEDIA)
+  
+  cliente         Cliente       @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  equipo          Equipo        @relation(fields: [equipoId], references: [id], onDelete: Cascade)
+  tecnico         Tecnico?      @relation(fields: [tecnicoId], references: [id], onDelete: SetNull)
+  mantenimientos  Mantenimiento[]
+  cotizaciones    Cotizacion[]
+  
+  @@map("ordenes_trabajo")
+}
+
+model Mantenimiento {
+  id              Int             @id @default(autoincrement())
+  ordenId         Int             @map("orden_id")
+  tipo            TipoMantenimiento
+  descripcion     String          @db.Text
+  evidenciaUrl    String?         @map("evidencia_url")
+  fechaEjecucion  DateTime?       @map("fecha_ejecucion")
+  horasTrabajadas Float?          @map("horas_trabajadas") @db.Decimal(4, 2)
+  observaciones   String?         @db.Text
+  
+  orden           OrdenTrabajo    @relation(fields: [ordenId], references: [id], onDelete: Cascade)
+  repuestos       DetalleRepuesto[]
+  
+  @@map("mantenimientos")
+}
+
+model Repuesto {
+  id          Int              @id @default(autoincrement())
+  nombre      String
+  codigo      String           @unique
+  precioUnitario Float         @map("precio_unitario") @db.Decimal(10, 2)
+  stock       Int              @default(0)
+  createdAt   DateTime         @default(now()) @map("created_at")
+  
+  detalles    DetalleRepuesto[]
+  
+  @@map("repuestos")
+}
+
+model DetalleRepuesto {
+  id             Int      @id @default(autoincrement())
+  mantenimientoId Int    @map("mantenimiento_id")
+  repuestoId     Int
+  cantidad       Int
+  costoTotal     Float    @map("costo_total") @db.Decimal(10, 2)
+  
+  mantenimiento  Mantenimiento @relation(fields: [mantenimientoId], references: [id], onDelete: Cascade)
+  repuesto       Repuesto      @relation(fields: [repuestoId], references: [id], onDelete: Cascade)
+  
+  @@unique([mantenimientoId, repuestoId])
+  @@map("detalle_repuestos")
+}
+
+model Cotizacion {
+  id             Int          @id @default(autoincrement())
+  ordenId        Int          @map("orden_id")
+  total          Float        @db.Decimal(10, 2)
+  descripcion    String?      @db.Text
+  fechaGeneracion DateTime    @default(now()) @map("fecha_generacion")
+  estado         EstadoCotizacion @default(PENDIENTE)
+  
+  orden          OrdenTrabajo @relation(fields: [ordenId], references: [id], onDelete: Cascade)
+  
+  @@map("cotizaciones")
+}
+
+// Enums
+enum Rol {
+  ADMIN
+  TECNICO
+  CLIENTE
+}
+
+enum TipoEquipo {
+  AIRE_ACONDICIONADO
+  VENTILADOR
+  CALEFACCION
+  CHILLER
+}
+
+enum EstadoEquipo {
+  OPERATIVO
+  EN_MANTENIMIENTO
+  FUERA_SERVICIO
+}
+
+enum EstadoOrden {
+  PENDIENTE
+  ASIGNADA
+  EN_PROGRESO
+  COMPLETADA
+  CANCELADA
+}
+
+enum Prioridad {
+  BAJA
+  MEDIA
+  ALTA
+  URGENTE
+}
+
+enum TipoMantenimiento {
+  PREVENTIVO
+  CORRECTIVO
+}
+
+enum EstadoCotizacion {
+  PENDIENTE
+  APROBADA
+  RECHAZADA
+}
+
