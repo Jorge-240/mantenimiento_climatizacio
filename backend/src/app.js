@@ -13,7 +13,9 @@ const PORT = process.env.PORT || 3001;
 // Middleware seguridad
 app.use(helmet());
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:19006', 'exp://192.168.1.*:19000'], // web + expo dev
+  origin: function(origin, callback) {
+    return callback(null, true); // Permite cualquier dominio dinámicamente (Vercel, localhost, etc)
+  },
   credentials: true
 }));
 app.use(morgan('combined'));
@@ -64,6 +66,10 @@ app.get('/api', (req, res) => {
     ],
     status: 'Backend COMPLETO - Fase 2 ✅ (CRUD básico por rol)'
   });
+});
+
+app.get('/', (req, res) => {
+  res.redirect('/api');
 });
 
 // 404 handler
